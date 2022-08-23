@@ -170,7 +170,7 @@ class MetricsModel:
         if created_since_list:
             return sum(created_since_list) / len(created_since_list)
         else:
-            return 0
+            return None
 
     def get_uuid_count_query(self, option, repos_list, field, date_field="grimoire_creation_date", size=0, from_date=str_to_datetime("1970-01-01"), to_date=datetime_utcnow()):
         query = {
@@ -441,7 +441,7 @@ class ActivityMetricsModel(MetricsModel):
         if updated_since_list:
             return sum(updated_since_list) / len(updated_since_list)
         else:
-            return 0
+            return None
 
     def closed_issue_count(self, date, repos_list):
         query_issue_closed = self.get_issue_closed_uuid_count(
@@ -468,7 +468,7 @@ class ActivityMetricsModel(MetricsModel):
         try:
             return float(issue['aggregations']["count_of_uuid"]['value']/issue["hits"]["total"]["value"])
         except ZeroDivisionError:
-            return 0
+            return None
 
     def code_review_count(self, date, repos_list):
         query_pr_comments_count = self.get_uuid_count_query(
@@ -478,7 +478,7 @@ class ActivityMetricsModel(MetricsModel):
         try:
             return prs['aggregations']["count_of_uuid"]['value']/prs["hits"]["total"]["value"]
         except ZeroDivisionError:
-            return 0
+            return None
 
     def recent_releases_count(self, date, repos_list):
         query_recent_releases_count = self.get_recent_releases_uuid_count(
@@ -544,7 +544,7 @@ class CommunitySupportMetricsModel(MetricsModel):
             50]
         issue_first_reponse_mid = self.es_in.search(index=self.issue_index, body=query_issue_first_reponse_mid)[
             'aggregations']["count_of_uuid"]['values']['50.0']
-        return issue_first_reponse_avg, issue_first_reponse_mid if issue_first_reponse_avg else 0, 0
+        return issue_first_reponse_avg, issue_first_reponse_mid if issue_first_reponse_avg else None, None
 
     def issue_open_time(self, date, repos_list):
         query_issue_opens = self.get_uuid_count_query("avg", repos_list, "time_to_first_attention_without_bot",
@@ -564,7 +564,7 @@ class CommunitySupportMetricsModel(MetricsModel):
         try:
             issue_open_time_repo_avg = sum(issue_open_time_repo)/len(issue_open_time_repo)
         except ZeroDivisionError:
-            issue_open_time_repo_avg = 0
+            issue_open_time_repo_avg = None
 
         issue_open_time_repo_mid = get_medium(issue_open_time_repo)
         return issue_open_time_repo_avg, issue_open_time_repo_mid
@@ -590,7 +590,7 @@ class CommunitySupportMetricsModel(MetricsModel):
             pr_open_time_repo_avg = float(
                 sum(pr_open_time_repo)/len(pr_open_time_repo))
         except ZeroDivisionError:
-            pr_open_time_repo_avg = 0
+            pr_open_time_repo_avg = None
         pr_open_time_repo_mid = get_medium(pr_open_time_repo)
         return pr_open_time_repo_avg, pr_open_time_repo_mid
 
@@ -602,7 +602,7 @@ class CommunitySupportMetricsModel(MetricsModel):
         try:
             return float(issue['aggregations']["count_of_uuid"]['value']/issue["hits"]["total"]["value"])
         except ZeroDivisionError:
-            return 0
+            return None
 
     def updated_issue_count(self, date, repos_list):
         query_issue_updated_since = self.get_uuid_count_query(
@@ -617,7 +617,7 @@ class CommunitySupportMetricsModel(MetricsModel):
         prs = self.es_in.search(index=self.pr_index,
                                 body=query_pr_comments_count)[
             'aggregations']["count_of_uuid"]['value']
-        return prs if prs else 0.0
+        return prs if prs else None
 
     def closed_pr_count(self, date, repos_list):
         query_pr_closed = self.get_pr_closed_uuid_count(
@@ -875,7 +875,7 @@ class CodeQualityGuaranteeMetricsModel(MetricsModel):
         try:
             return is_maintained_list.count("True") / len(is_maintained_list)
         except ZeroDivisionError:
-            return 0
+            return None
 
     def LOC_frequency(self, date, repos_list):
         query_LOC_frequency = self.get_uuid_count_query(
